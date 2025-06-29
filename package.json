@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "ipfs-http-client": "^63.0.0",
+    "ipfs-http-client": "^60.0.0",
     "orbit-db": "^1.0.0"
   },
   "scripts": {

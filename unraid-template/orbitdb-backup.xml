@@ -1,0 +1,45 @@
+<Container>
+    <Name>orbitdb-backup</Name>
+    <Repository>huluvu424242/orbitdb-backup:latest</Repository>
+    <Registry>https://hub.docker.com/r/huluvu424242/orbitdb-backup</Registry>
+    <Network>bridge</Network>
+    <MyIP/>
+    <Shell>sh</Shell>
+    <Privileged>false</Privileged>
+    <Support>https://github.com/huluvu424242/orbitdb-backup</Support>
+    <Project>https://github.com/huluvu424242/orbitdb-backup</Project>
+    <Overview>OrbitDB Backup-Replikator: Lauscht auf Änderungen einer OrbitDB und pinnt die Einträge automatisch im IPFS-Node. Mit WebUI für manuelles Initial-Backup.</Overview>
+    <Category>Backup:OrbitDB</Category>
+    <WebUI>http://[IP]:[PORT:3000]</WebUI>
+    <Icon>https://raw.githubusercontent.com/huluvu424242/orbitdb-backup/main/icon.png</Icon>
+    <ExtraParams/>
+    <PostArgs/>
+    <CPUset/>
+    <DateInstalled>2025-06-29</DateInstalled>
+
+    <Environment>
+        <Variable>
+            <Name>ORBITDB_ADDR</Name>
+            <Value>orbitdb/Qm.../mydb</Value>
+            <Description>Die vollständige OrbitDB-Adresse, die überwacht werden soll</Description>
+        </Variable>
+        <Variable>
+            <Name>IPFS_API_URL</Name>
+            <Value>http://ipfs:5001</Value>
+            <Description>URL zur IPFS API, i. d. R. der IPFS-Container im selben Docker-Netz</Description>
+        </Variable>
+        <Variable>
+            <Name>LOG_LEVEL</Name>
+            <Value>info</Value>
+            <Description>Log-Level: debug, info, warn, error</Description>
+        </Variable>
+    </Environment>
+
+    <Data>
+        <Volume>
+            <HostDir>/mnt/user/appdata/orbitdb-backup</HostDir>
+            <ContainerDir>/app/config</ContainerDir>
+            <Mode>rw</Mode>
+        </Volume>
+    </Data>
+</Container>

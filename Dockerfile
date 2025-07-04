@@ -1,6 +1,10 @@
 FROM node:20-alpine
+
 WORKDIR /app
-COPY . .
-RUN npm install --legacy-peer-deps
-EXPOSE 3000
-CMD ["node", "index.js"]
+
+COPY package.json package-lock.json* ./
+RUN npm install --omit=dev
+
+COPY src/ ./src/
+
+CMD ["npm", "start"]

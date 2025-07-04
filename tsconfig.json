@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                     // moderne Spracheigenschaften
+    "module": "ES2022",                     // Native ES Module
+    "moduleResolution": "node",            // für npm-Pakete
+    "lib": ["ES2022", "DOM"],              // DOM für EventListener
+    "esModuleInterop": true,               // `import x from 'x'`-Kompatibilität
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                        // optional, aber empfohlen
+    "skipLibCheck": true,                  // vermeidet Probleme mit d.ts-Dateien
+    "outDir": "dist",                      // fertige JS-Dateien kommen hierhin
+    "rootDir": "src",                      // Quellcodeverzeichnis
+    "resolveJsonModule": true,             // falls du JSON importieren willst
+    "allowSyntheticDefaultImports": true,  // für z.B. `import express from 'express'`
+    "allowJs": false ,                      // wir schreiben nur TS
+    "typeRoots": ["./types", "./node_modules/@types"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

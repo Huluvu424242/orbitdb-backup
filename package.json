@@ -2,7 +2,7 @@
   "name": "@huluvu424242/orbitdb-backup",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "author": "Thomas Schubert <huluvu424242@users.noreply.github.com>",
   "license": "MIT",
   "repository": {
@@ -14,11 +14,12 @@
     "url": "https://github.com/huluvu424242/orbitdb-backup/issues"
   },
   "dependencies": {
-    "express": "^5.1.0",
-    "ipfs-http-client": "^60.0.0",
-    "orbit-db": "^0.29.0"
+    "@chainsafe/libp2p-gossipsub": "^11.1.0",
+    "@orbitdb/core": "^2.0.1",
+    "blockstore-level": "^1.1.7",
+    "helia": "^4.0.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js"
   }
 }

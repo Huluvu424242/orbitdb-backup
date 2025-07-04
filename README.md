@@ -4,28 +4,23 @@ Dieses Projekt implementiert einen OrbitDB-Backup-Replikator, der direkt im IPFS
 
 ## Nutzung
 
-1. Auf Unraid: IPFS-Container öffnen:
-   ```
-   docker exec -it <ipfs-container-name> /bin/sh
-   ```
+### Ohne Docker
 
-2. Node.js & npm installieren (sofern Alpine):
-   ```
-   apk add nodejs npm
-   ```
+npm -i
+mpm start
 
-3. Projektverzeichnis kopieren oder `wget`/`curl` herunterladen und entpacken.
+#### Mit Docker
 
-4. Abhängigkeiten installieren:
-   ```
-   cd /pfad/zum/projekt
-   npm install
-   ```
+1. Image bauen
+docker build -t orbit-backup .
+2. container von image starten 
+docker run --network host --name orbitdb-backup-container orbitdb-backup
+3. ggf. muss ein verbundenen Container vorher gelöscht werden:
+docker rm <hash>
+4. laufenden Container Logs beobachten
+docker logs -f orbitdb-backup-container
+6. Eine Shell im Container öffnen
+docker exec -it orbitdb-backup-container sh
+5. Testeintrag vornehmen
+node tests/int-test.js
 
-5. Starten:
-   ```
-   ORBITDB_ADDR=orbitdb/Qm.../mydb IPFS_API_URL=http://127.0.0.1:5001 node index.js
-   ```
-
-6. Weboberfläche unter `http://<unraid-ip>:3000` erreichbar.
- 

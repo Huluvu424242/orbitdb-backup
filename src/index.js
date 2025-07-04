@@ -74,8 +74,20 @@ if (process.argv.length > 2) {
 
     console.log(db.address)
 
-    db.events.on('update', event => {
-        console.log('update', event)
+    const pinEntry = async cid => {
+        try {
+            await ipfs.pin.add(cid)
+            console.log('📌 Gepinnt:', cid)
+        } catch (err) {
+            console.warn('⚠️ Pin fehlgeschlagen:', err.message)
+        }
+    }
+
+    // Jeden neu replizierten Eintrag sofort pinnen
+    db.events.on('replicate.progress', async (_address, hash, entry) => {
+        const cid = entry?.cid || entry?.hash || hash
+        console.log('🔄 Neuer Eintrag:', cid)
+        await pinEntry(cid)
     })
 }
 

@@ -41,6 +41,7 @@
     "pinning"
   ],
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "node tests/int-test.js"
   }
 }

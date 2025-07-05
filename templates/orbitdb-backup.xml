@@ -2,21 +2,23 @@
     <Name>orbitdb-backup</Name>
     <Repository>huluvu424242/orbitdb-backup:latest</Repository>
     <Registry>https://hub.docker.com/r/huluvu424242/orbitdb-backup</Registry>
-    <Network>bridge</Network>
-    <MyIP/>
-    <Shell>sh</Shell>
     <Privileged>false</Privileged>
     <Support>https://github.com/huluvu424242/orbitdb-backup</Support>
     <Project>https://github.com/huluvu424242/orbitdb-backup</Project>
-    <Overview>OrbitDB Backup-Replikator: Lauscht auf Änderungen einer OrbitDB und pinnt die Einträge automatisch im IPFS-Node. Mit WebUI für manuelles Initial-Backup.</Overview>
+    <Overview>
+        Dieses Tool überwacht eine bestehende OrbitDB-Datenbank (über einen externen IPFS-Kubo-Node)
+        und pinnt neue Einträge automatisch über die REST API des Nodes. Ideal für IPFS-basierte Backups.
+    </Overview>
     <Category>Backup:OrbitDB</Category>
     <WebUI>http://[IP]:[PORT:3000]</WebUI>
-    <Icon>https://raw.githubusercontent.com/huluvu424242/orbitdb-backup/main/icon.png</Icon>
+    <Icon>https://raw.githubusercontent.com/huluvu424242/unraid-templates/main/templates/icon.png</Icon>
     <ExtraParams/>
     <PostArgs/>
     <CPUset/>
     <DateInstalled>2025-06-29</DateInstalled>
-
+    <Networking>
+        <Mode>bridge</Mode>
+    </Networking>
     <Environment>
         <Variable>
             <Name>ORBITDB_ADDR</Name>
@@ -34,12 +36,6 @@
             <Description>Log-Level: debug, info, warn, error</Description>
         </Variable>
     </Environment>
-
-    <Data>
-        <Volume>
-            <HostDir>/mnt/user/appdata/orbitdb-backup</HostDir>
-            <ContainerDir>/app/config</ContainerDir>
-            <Mode>rw</Mode>
-        </Volume>
-    </Data>
+    <TemplateURL>https://raw.githubusercontent.com/huluvu424242/unraid-templates/main/templates/orbitdb-backup.xml</TemplateURL>
+    <Icon>https://raw.githubusercontent.com/huluvu424242/unraid-templates/main/templates/icon.png</Icon>
 </Container>

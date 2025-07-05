@@ -8,17 +8,19 @@ import { tcp } from '@libp2p/tcp'
 import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import { noise } from '@chainsafe/libp2p-noise'
 import { LevelBlockstore } from 'blockstore-level'
+import process from 'node:process'
 
-/**
- * Beispiel-Aufruf:
- * node put-entry.js /orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg
- */
+const debug = process.argv.includes('--debug')
+const remoteDBAddress = '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg'
+
+if (!remoteDBAddress) {
+    console.error('❌ Bitte gültige OrbitDB-Adresse angeben, z.B. /orbitdb/zdpuXYZ...')
+    process.exit(1)
+}
 
 const libp2pOptions = {
     peerDiscovery: [mdns()],
-    addresses: {
-        listen: ['/ip4/0.0.0.0/tcp/0']
-    },
+    addresses: { listen: ['/ip4/0.0.0.0/tcp/0'] },
     transports: [tcp()],
     connectionEncryption: [noise()],
     streamMuxers: [yamux()],
@@ -28,42 +30,45 @@ const libp2pOptions = {
     }
 }
 
-const id = 'client' // oder dynamisch erzeugen
+const id = 'client'
 const blockstore = new LevelBlockstore(`./ipfs/${id}`)
 const libp2p = await createLibp2p(libp2pOptions)
-setInterval(() => {
-    console.log(`[${id}] Verbundene Peers:`, libp2p.getPeers().map(p => p.id.toString()))
-}, 3000)
-setInterval(() => {
-    console.log('📡 Topics:', libp2p.services.pubsub.getTopics())
-}, 5000)
-
 const ipfs = await createHelia({ libp2p, blockstore })
 const orbitdb = await createOrbitDB({ ipfs, id: `client`, directory: `./orbitdb/${id}` })
 
-// const remoteDBAddress = process.argv[2]
-const remoteDBAddress = '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg'
-
-if (!remoteDBAddress || !remoteDBAddress.startsWith('/orbitdb/')) {
-    console.error('❌ Bitte eine gültige OrbitDB-Adresse angeben (z. B. /orbitdb/zdpuXYZ...)')
-    process.exit(1)
+if (debug) {
+    setInterval(() => {
+        console.log('🌐 Client Multiaddrs:')
+        libp2p.getMultiaddrs().forEach(addr => console.log('   ', addr.toString()))
+    }, 7000)
+    setInterval(() => {
+        const peers = libp2p.getPeers()
+        console.log('🤝 Aktive Peers:', peers.length)
+        for (const peer of peers) {
+            console.log(' -', peer.id.toString())
+        }
+    }, 5000)
 }
 
 const db = await orbitdb.open(remoteDBAddress)
 
 const now = new Date().toISOString()
+const entry = {
+    id: 'replicator-test',
+    time: now,
+    message: '🛰️ Eintrag vom externen Test-Client'
+}
 
-console.log(`📤 Sende Testeintrag an DB ${db.address.toString()}...`)
-await db.add({ id: 'replicator-test', time: now, message: '🛰️ Eintrag vom externen Test-Client' })
-
-console.log('✅ Testeintrag gespeichert')
+console.log(`📤 Schreibe Testeintrag in ${db.address.toString()}...`)
+await db.add(entry)
+console.log('✅ Eintrag gespeichert.')
 
 console.log('📋 Aktuelle Inhalte:')
 for await (const item of db.iterator()) {
     console.log('•', item)
 }
 
-// Beende sauber bei STRG+C
+// Clean shutdown
 process.on('SIGINT', async () => {
     console.log("⏹️ Schließe…")
     await db.close()

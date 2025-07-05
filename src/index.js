@@ -34,13 +34,19 @@ async function createLocalIpfs(id) {
 
     if (debug) {
         setInterval(() => {
-            const peers = libp2p.getPeers().map(p => p.id.toString())
-            const topics = libp2p.services.pubsub.getTopics()
-            console.log(`[${id}] Peers:`, peers)
-            console.log(`[${id}] Topics:`, topics)
-        }, 5000)
-    }
+            console.log('🌐 Replicator Multiaddrs:')
+            libp2p.getMultiaddrs().forEach(addr => console.log('   ', addr.toString()))
+        }, 7000)
 
+        setInterval(() => {
+            const peers = libp2p.getPeers()
+            console.log('🤝 Aktive Peers:', peers.length)
+            for (const peer of peers) {
+                console.log(' -', peer.id.toString())
+            }
+        }, 5000)
+
+    }
     const ipfs = await createHelia({ libp2p, blockstore })
     return ipfs
 }
@@ -69,6 +75,10 @@ async function createIpfsInstance() {
 
 const { ipfs, id, remote } = await createIpfsInstance()
 const orbitdb = await createOrbitDB({ ipfs, id: `nodejs-${id}`, directory: `./orbitdb/${id}` })
+
+
+
+
 
 let db
 if (remote) {

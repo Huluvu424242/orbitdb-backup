@@ -81,6 +81,7 @@ if (remote) {
     }
 
     db.events.on('update', async entry => {
+        console.log('🔄Update:', entry);
         const cid = entry?.cid || entry?.hash
         if (!cid) return
         console.log('🔄 Neuer Eintrag:', cid)

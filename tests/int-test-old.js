@@ -35,7 +35,7 @@ const ipfs = await createHelia({ libp2p, blockstore })
 const orbitdb = await createOrbitDB({ ipfs, id: `client`, directory: `./orbitdb/${id}` })
 
 // const remoteDBAddress = process.argv[2]
-const remoteDBAddress = '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg'
+const remoteDBAddress = '/orbitdb/zdpuAuNZTDiZHy2xpFGeVV5r5GELDxAkAdATeT5bATuGKSsER'
 
 if (!remoteDBAddress || !remoteDBAddress.startsWith('/orbitdb/')) {
     console.error('❌ Bitte eine gültige OrbitDB-Adresse angeben (z. B. /orbitdb/zdpuXYZ...)')

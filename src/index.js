@@ -94,7 +94,7 @@ const remoteDBAddress = process.argv.find(arg => arg.startsWith('/orbitdb/'))
 console.log('RemoteAdresse: %s',remoteDBAddress);
 const db = await orbitdb.open(remoteDBAddress,{
     // type: 'log',
-    create: !remote,
+    // create: !remote,
     ...( !remote && { AccessController: OrbitDBAccessController({ write: ['*'] }) } )
 });
 

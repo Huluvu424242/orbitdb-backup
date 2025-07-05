@@ -28,8 +28,7 @@ async function createLocalIpfs(id) {
 
     const blockstore = new LevelBlockstore(`./ipfs/${id}`)
     const libp2p = await createLibp2p(libp2pOptions)
-    const ipfs = await createHelia({ libp2p, blockstore })
-    return ipfs
+    return await createHelia({ libp2p, blockstore })
 }
 
 async function createIpfsInstance() {
@@ -47,11 +46,11 @@ async function createIpfsInstance() {
             console.error('❌ Verbindung zu Remote-IPFS fehlgeschlagen:', err.message)
             process.exit(1)
         }
+    }else {
+        console.log('✨ Lokaler IPFS-Modus')
+        const ipfs = await createLocalIpfs(id)
+        return {ipfs, id, remote: false}
     }
-
-    console.log('✨ Lokaler IPFS-Modus')
-    const ipfs = await createLocalIpfs(id)
-    return { ipfs, id, remote: false }
 }
 
 const { ipfs, id, remote } = await createIpfsInstance()

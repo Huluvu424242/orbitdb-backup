@@ -28,6 +28,13 @@ async function createLocalIpfs(id) {
 
     const blockstore = new LevelBlockstore(`./ipfs/${id}`)
     const libp2p = await createLibp2p(libp2pOptions)
+    setInterval(() => {
+        console.log(`[${id}] Verbundene Peers:`, libp2p.getPeers().map(p => p.id.toString()))
+    }, 3000)
+    setInterval(() => {
+        console.log('📡 Topics:', libp2p.services.pubsub.getTopics())
+    }, 5000)
+
     return await createHelia({ libp2p, blockstore })
 }
 
@@ -85,6 +92,13 @@ if (remote) {
         if (!cid) return
         console.log('🔄 Neuer Eintrag:', cid)
         await pinEntry(cid)
+    })
+
+    db.events.on('replicated', async () => {
+        console.log('♻️ Replikation erkannt')
+        for await (const item of db.iterator({ limit: -1 })) {
+            console.log('📥 Eintrag:', item)
+        }
     })
 }
 

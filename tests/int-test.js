@@ -31,6 +31,13 @@ const libp2pOptions = {
 const id = 'client' // oder dynamisch erzeugen
 const blockstore = new LevelBlockstore(`./ipfs/${id}`)
 const libp2p = await createLibp2p(libp2pOptions)
+setInterval(() => {
+    console.log(`[${id}] Verbundene Peers:`, libp2p.getPeers().map(p => p.id.toString()))
+}, 3000)
+setInterval(() => {
+    console.log('📡 Topics:', libp2p.services.pubsub.getTopics())
+}, 5000)
+
 const ipfs = await createHelia({ libp2p, blockstore })
 const orbitdb = await createOrbitDB({ ipfs, id: `client`, directory: `./orbitdb/${id}` })
 

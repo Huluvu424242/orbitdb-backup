@@ -1,3 +1,4 @@
+// src/index.js
 import { createOrbitDB, OrbitDBAccessController } from '@orbitdb/core'
 import { createHelia } from 'helia'
 import { createLibp2p } from 'libp2p'
@@ -10,6 +11,8 @@ import { noise } from '@chainsafe/libp2p-noise'
 import { LevelBlockstore } from 'blockstore-level'
 import { create as createHttpClient } from 'ipfs-http-client'
 import process from 'node:process'
+
+const debug = process.argv.includes('--debug')
 
 async function createLocalIpfs(id) {
     const libp2pOptions = {
@@ -28,14 +31,18 @@ async function createLocalIpfs(id) {
 
     const blockstore = new LevelBlockstore(`./ipfs/${id}`)
     const libp2p = await createLibp2p(libp2pOptions)
-    setInterval(() => {
-        console.log(`[${id}] Verbundene Peers:`, libp2p.getPeers().map(p => p.id.toString()))
-    }, 3000)
-    setInterval(() => {
-        console.log('📡 Topics:', libp2p.services.pubsub.getTopics())
-    }, 5000)
 
-    return await createHelia({ libp2p, blockstore })
+    if (debug) {
+        setInterval(() => {
+            const peers = libp2p.getPeers().map(p => p.id.toString())
+            const topics = libp2p.services.pubsub.getTopics()
+            console.log(`[${id}] Peers:`, peers)
+            console.log(`[${id}] Topics:`, topics)
+        }, 5000)
+    }
+
+    const ipfs = await createHelia({ libp2p, blockstore })
+    return ipfs
 }
 
 async function createIpfsInstance() {
@@ -53,10 +60,10 @@ async function createIpfsInstance() {
             console.error('❌ Verbindung zu Remote-IPFS fehlgeschlagen:', err.message)
             process.exit(1)
         }
-    }else {
+    } else {
         console.log('✨ Lokaler IPFS-Modus')
         const ipfs = await createLocalIpfs(id)
-        return {ipfs, id, remote: false}
+        return { ipfs, id, remote: false }
     }
 }
 
@@ -86,19 +93,21 @@ if (remote) {
         }
     }
 
-    db.events.on('update', async entry => {
-        console.log('🔄Update:', entry);
-        const cid = entry?.cid || entry?.hash
-        if (!cid) return
-        console.log('🔄 Neuer Eintrag:', cid)
-        await pinEntry(cid)
-    })
-
     db.events.on('replicated', async () => {
         console.log('♻️ Replikation erkannt')
         for await (const item of db.iterator({ limit: -1 })) {
-            console.log('📥 Eintrag:', item)
+            const cid = item?.cid?.toString() || item?.hash
+            if (!cid) continue
+            console.log('📥 Neuer replizierter Eintrag:', cid)
+            await pinEntry(cid)
         }
+    })
+
+    db.events.on('update', async entry => {
+        const cid = entry?.cid || entry?.hash
+        if (!cid) return
+        console.log('📝 Lokaler Update-Eintrag:', cid)
+        await pinEntry(cid)
     })
 }
 

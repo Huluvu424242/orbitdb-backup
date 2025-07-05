@@ -43,6 +43,7 @@
   ],
   "scripts": {
     "start": "node src/index.js",
+    "debug": "node src/index.js --debug",
     "test": "node tests/int-test.js"
   }
 }

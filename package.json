@@ -14,12 +14,16 @@
     "url": "https://github.com/huluvu424242/orbitdb-backup/issues"
   },
   "dependencies": {
+    "@chainsafe/libp2p-gossipsub": "^14.1.1",
     "@chainsafe/libp2p-noise": "^16.1.4",
+    "@chainsafe/libp2p-yamux": "^7.0.4",
+    "@libp2p/mdns": "^11.0.43",
     "@libp2p/mplex": "^11.0.43",
     "@libp2p/tcp": "^10.1.17",
     "@libp2p/websockets": "^9.2.17",
     "@orbitdb/core": "^2.1.0",
     "blockstore-core": "^5.0.4",
+    "blockstore-level": "^2.0.3",
     "datastore-core": "^10.0.4",
     "helia": "^5.4.2",
     "ipfs-core": "^0.18.1",

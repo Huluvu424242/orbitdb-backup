@@ -1,35 +1,40 @@
-// src/index.js
-import { createLibp2p } from 'libp2p'
 import { createOrbitDB, OrbitDBAccessController } from '@orbitdb/core'
-import { tcp } from '@libp2p/tcp'
-import { webSockets } from '@libp2p/websockets'
-import { noise } from '@chainsafe/libp2p-noise'
-import { mplex } from '@libp2p/mplex'
 import { createHelia } from 'helia'
-import { MemoryDatastore } from 'datastore-core/memory'
-import { MemoryBlockstore } from 'blockstore-core/memory'
+import { createLibp2p } from 'libp2p'
+import { identify } from '@libp2p/identify'
+import { mdns } from '@libp2p/mdns'
+import { yamux } from '@chainsafe/libp2p-yamux'
+import { tcp } from '@libp2p/tcp'
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
+import { noise } from '@chainsafe/libp2p-noise'
+import { LevelBlockstore } from 'blockstore-level'
+import { create as createHttpClient } from 'ipfs-http-client'
+import process from 'node:process'
 
-async function createWorkingLocalIpfs() {
-    const libp2p = await createLibp2p({
-        transports: [tcp(), webSockets()],
-        connectionEncryption: [noise()],
-        streamMuxers: [mplex()],
+async function createLocalIpfs(id) {
+    const libp2pOptions = {
+        peerDiscovery: [mdns()],
         addresses: {
-            listen: ['/ip4/127.0.0.1/tcp/0']
+            listen: ['/ip4/0.0.0.0/tcp/0']
+        },
+        transports: [tcp()],
+        connectionEncryption: [noise()],
+        streamMuxers: [yamux()],
+        services: {
+            identify: identify(),
+            pubsub: gossipsub({ emitSelf: true })
         }
-    })
+    }
 
-    const helia = await createHelia({
-        datastore: new MemoryDatastore(),
-        blockstore: new MemoryBlockstore(),
-        libp2p
-    })
-
-    return helia.ipfs
+    const blockstore = new LevelBlockstore(`./ipfs/${id}`)
+    const libp2p = await createLibp2p(libp2pOptions)
+    const ipfs = await createHelia({ libp2p, blockstore })
+    return ipfs
 }
 
 async function createIpfsInstance() {
     const remoteUrlArg = process.argv.find(arg => arg.startsWith('--remote-ipfs='))
+    const id = process.argv.length > 2 ? 2 : 1
 
     if (remoteUrlArg) {
         const url = remoteUrlArg.split('=')[1]
@@ -37,44 +42,56 @@ async function createIpfsInstance() {
         try {
             const ipfs = createHttpClient({ url })
             await ipfs.id()
-            return ipfs
+            return { ipfs, id, remote: true }
         } catch (err) {
             console.error('❌ Verbindung zu Remote-IPFS fehlgeschlagen:', err.message)
+            process.exit(1)
         }
     }
 
     console.log('✨ Lokaler IPFS-Modus')
-    return await createWorkingLocalIpfs()
+    const ipfs = await createLocalIpfs(id)
+    return { ipfs, id, remote: false }
 }
 
-const ipfs = await createIpfsInstance()
-const orbitdb = await createOrbitDB({ ipfs })
+const { ipfs, id, remote } = await createIpfsInstance()
+const orbitdb = await createOrbitDB({ ipfs, id: `nodejs-${id}`, directory: `./orbitdb/${id}` })
 
-const isRemote = process.argv.some(arg => arg.startsWith('--remote-ipfs='))
-const db = await orbitdb.open(
-    isRemote
-        ? '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg'
-        : 'lokale-backup-db',
-    {
-        type: 'log',
-        create: !isRemote,
-        sync: true
+let db
+if (remote) {
+    const remoteDBAddress = process.argv.pop()
+    db = await orbitdb.open(remoteDBAddress)
+    await db.add(`hello world from peer ${id}`)
+
+    for await (const res of db.iterator()) {
+        console.log(res)
     }
-)
+} else {
+    db = await orbitdb.open('nodejs', { AccessController: OrbitDBAccessController({ write: ['*'] }) })
 
-console.log('Warte auf neue Einträge...')
+    console.log('DB-Adresse:', db.address.toString())
 
-db.events.on('replicated', async () => {
-    console.log('Neue Einträge erkannt')
-    for await (const entry of db.iterator({ limit: -1 })) {
-        const cid = entry.cid.toString()
-        console.log(`✔️ CID: ${cid}`)
-
+    const pinEntry = async cid => {
         try {
-            await ipfs.pin.add(entry.cid)
-            console.log(`📌 Gepinnt: ${cid}`)
+            await ipfs.pins.add(cid)
+            console.log('📌 Gepinnt:', cid)
         } catch (err) {
-            console.error(`❌ Fehler beim Pinnen: ${cid}`, err.message)
+            console.warn('⚠️ Pin fehlgeschlagen:', err.message)
         }
     }
+
+    db.events.on('update', async entry => {
+        const cid = entry?.cid || entry?.hash
+        if (!cid) return
+        console.log('🔄 Neuer Eintrag:', cid)
+        await pinEntry(cid)
+    })
+}
+
+process.on('SIGINT', async () => {
+    console.log("Exiting...")
+    await db.close()
+    await orbitdb.stop()
+    await ipfs.stop()
+    process.exit(0)
 })

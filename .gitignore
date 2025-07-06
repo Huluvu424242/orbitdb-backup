@@ -1,6 +1,5 @@
 # Default ignored files
 /shelf/
-/.idea/workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
 # Environment-dependent path to Maven home directory
@@ -10,3 +9,10 @@
 /dataSources.local.xml
 /node-cache/
 /node-modules/
+/orbitdb/
+/ipfs/
+/tests/ipfs/
+/tests/orbitdb/
+/dist/
+/.idea/
+

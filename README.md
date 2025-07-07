@@ -1,5 +1,10 @@
 # OrbitDB Backup Replikator
 
+![AI unterstützt von ChatGPT](src/docs/markdown/images/callout_ai_unterstuetzt_von_chatgpt.svg)
+
+> ℹ️ Info: Dieses Projekt enthält hauptsächlich Inhalte, die mithilfe von ChatGPT (OpenAI) generiert, überarbeitet oder zusammengefasst wurden.
+
+
 ## Was realisiert das Projekt?
 Dieses Projekt implementiert einen OrbitDB Backup-Replikator, der auf einem Unraid-System als ergänzender Docker-Container zum IPFS-Knoten (z.B. einem IPFS Kubo Node) betrieben werden kann. Ziel ist die automatische Sicherung und langfristige Verfügbarkeit einer OrbitDB-Datenbank.
 

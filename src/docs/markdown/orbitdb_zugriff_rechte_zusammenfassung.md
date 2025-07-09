@@ -7,9 +7,9 @@ Kann man bei Kenntnis der Adresse einer OrbitDB die ursprüngliche Konfiguration
 ## Erkenntnisse
 
 - Eine OrbitDB-Adresse verweist auf eine **Manifest-Datei**, die u.a. den Typ der Datenbank, ihren Namen und die Adresse des verwendeten Access Controllers enthält.
-- Die **Access Controller Konfiguration** (z. B. Schreibrechte) ist in einer **separaten OrbitDB** gespeichert.
+- Die **Access Controller Konfiguration** (z.B. Schreibrechte) ist in einer **separaten OrbitDB** gespeichert.
 - **Lese-Rechte gibt es nicht**, da IPFS standardmäßig öffentlich lesbar ist (sofern Daten nicht verschlüsselt wurden).
-- Die Schreibrechte lassen sich **nur dann rekonstruieren**, wenn die zugehörige AccessController-Datenbank im IPFS weiterhin verfügbar ist (z. B. durch Pinning).
+- Die Schreibrechte lassen sich **nur dann rekonstruieren**, wenn die zugehörige AccessController-Datenbank im IPFS weiterhin verfügbar ist (z.B. durch Pinning).
 - Nach dem Verlust einer DB kann ein Replikator eine neue OrbitDB anlegen. Wenn dieser die **Manifest-Datei und die AccessController-DB pinnt**, bleiben die Konfigurationsdaten auch für andere Clients auslesbar.
 
 ## Empfehlung

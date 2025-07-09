@@ -27,7 +27,7 @@ Nach dem Start beobachtet der Replikator die konfigurierte Datenbank:
 ## 3. Schutz vor Datenverlust
 
 Indem der Replikator sämtliche Inhalte der Datenbank pinnt, verhindert er das unbeabsichtigte Verschwinden der Daten aus dem IPFS. Ausführliche Informationen hierzu finden sich im Abschnitt  
-[`Persistenz von Orbit Datenbanken`](src/docs/markdown/PersistenzVonOrbitDatenbanken.md).
+[`Persistenz von Orbit Datenbanken`](src/docs/markdown/OrbitDBPersistenz.md).
 
 Da ein Totalverlust – z.B. durch globale Internetausfälle oder den gleichzeitigen Ausfall aller Replikatoren – **nie ausgeschlossen** werden kann, erstellt der Replikator regelmäßig **Backups** im JSON-Format.
 

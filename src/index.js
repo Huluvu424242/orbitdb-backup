@@ -1,80 +1,18 @@
 // src/index.js
 import {createOrbitDB, OrbitDBAccessController} from '@orbitdb/core'
-import {createHelia} from 'helia'
-import {createLibp2p} from 'libp2p'
-import {identify} from '@libp2p/identify'
-import {mdns} from '@libp2p/mdns'
-import {yamux} from '@chainsafe/libp2p-yamux'
-import {tcp} from '@libp2p/tcp'
-import {gossipsub} from '@chainsafe/libp2p-gossipsub'
-import {noise} from '@chainsafe/libp2p-noise'
-import {LevelBlockstore} from 'blockstore-level'
-import {create as createHttpClient} from 'ipfs-http-client'
 import process from 'node:process'
-// import { log } from '@orbitdb/database-log'
-// import { docstore } from '@orbitdb/database-docstore'
-
-const libp2pOptions = {
-    peerDiscovery: [mdns()],
-    addresses: {
-        listen: ['/ip4/0.0.0.0/tcp/0']
-    },
-    transports: [tcp()],
-    connectionEncryption: [noise()],
-    streamMuxers: [yamux()],
-    services: {
-        identify: identify(),
-        pubsub: gossipsub({emitSelf: true})
-    }
-}
-
-function activateDebugLogging(isDebugActive, libp2p) {
-    if (isDebugActive) {
-        setInterval(() => {
-            console.log('🌐 Replicator Multiaddrs:')
-            libp2p.getMultiaddrs().forEach(addr => console.log('   ', addr.toString()))
-        }, 7000)
-
-        setInterval(() => {
-            const peers = libp2p.getPeers()
-            console.log('🤝 Aktive Peers:', peers.length)
-            for (const peer of peers) {
-                console.log(' -', peer.id.toString())
-            }
-        }, 5000)
-    }
-}
-
-async function createLocalIpfs() {
-    console.log('✨ Lokaler IPFS-Modus');
-    const blockstore = new LevelBlockstore(`./ipfs/replicator1`);
-    const libp2p = await createLibp2p(libp2pOptions);
-    activateDebugLogging(isDebugActive, libp2p);
-    return await createHelia({libp2p, blockstore})
-}
-
-async function createRemoteIpfs(url) {
-    console.log(`✨ Remote IPFS-Modus: ${url}`);
-    try {
-        const ipfs = createHttpClient({url})
-        await ipfs.id()
-        return {ipfs,  remote: true}
-    } catch (err) {
-        console.error('❌ Verbindung zu Remote-IPFS fehlgeschlagen:', err.message)
-        process.exit(1)
-    }
-}
-
-async function createIpfsInstance(remoteUrlArg) {
-    const url = remoteUrlArg ? remoteUrlArg.split('=')[1] : null;
-    const ipfs = remoteUrlArg ? await createRemoteIpfs(url) : await createLocalIpfs()
-    return {ipfs, remote: false}
-}
+import {createRemoteIpfs} from "./remote.js";
+import {createLocalIpfs} from "./local.js";
 
 
 const isDebugActive = process.argv.includes('--debug');
 const remoteUrlArg = process.argv.find(arg => arg.startsWith('--remote-ipfs='));
 
+async function createIpfsInstance(remoteUrlArg) {
+    const url = remoteUrlArg ? remoteUrlArg.split('=')[1] : null;
+    const ipfs = remoteUrlArg ? await createRemoteIpfs(isDebugActive,url) : await createLocalIpfs(isDebugActive);
+    return {ipfs, remote: !!remoteUrlArg};
+}
 
 const {ipfs, remote} = await createIpfsInstance(remoteUrlArg);
 console.log('remote: %s',remote );
@@ -88,11 +26,11 @@ const orbitdb = await createOrbitDB({ipfs, id: 'replicator1', directory: `./orbi
 console.log("ORBIT DB %s",orbitdb);
 
 
-const remoteDBAddress = process.argv.find(arg => arg.startsWith('/orbitdb/'))
+const orbitDBAdress = process.argv.find(arg => arg.startsWith('/orbitdb/'))
     || 'appstorage';
     // || '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg';
-console.log('RemoteAdresse: %s',remoteDBAddress);
-const db = await orbitdb.open(remoteDBAddress,{
+console.log('RemoteAdresse: %s',orbitDBAdress);
+const db = await orbitdb.open(orbitDBAdress,{
     // type: 'log',
     // create: !remote,
     ...( !remote && { AccessController: OrbitDBAccessController({ write: ['*'] }) } )

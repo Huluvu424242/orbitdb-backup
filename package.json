@@ -23,7 +23,6 @@
     "@libp2p/tcp": "^10.1.17",
     "@libp2p/websockets": "^9.2.17",
     "@orbitdb/core": "^2.1.0",
-    "@orbitdb/database-log": "^0.1.0",
     "blockstore-core": "^5.0.4",
     "blockstore-level": "^2.0.3",
     "datastore-core": "^10.0.4",

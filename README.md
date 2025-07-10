@@ -6,7 +6,7 @@
 
 
 ## Was realisiert das Projekt?
-Dieses Projekt implementiert einen OrbitDB Backup-Replikator, der auf einem Unraid-System als ergänzender Docker-Container zum IPFS-Node (z.B. einem [IPFS Kubo Node](IPFS-KuboNode.md)) betrieben werden kann. Ziel ist die automatische Sicherung und langfristige Verfügbarkeit einer OrbitDB-Datenbank.
+Dieses Projekt implementiert einen OrbitDB Backup-Replikator, der auf einem Unraid-System als ergänzender Docker-Container zum IPFS-Node (z.B. einem [IPFS Kubo Node](src/docs/markdown/IPFS-KuboNode.md)) betrieben werden kann. Ziel ist die automatische Sicherung und langfristige Verfügbarkeit einer OrbitDB-Datenbank.
 
 # Arbeitsweise eines PEM-gestützten OrbitDB Backup Replikators
 
@@ -35,7 +35,7 @@ Da ein Totalverlust – z.B. durch globale Internetausfälle oder den gleichzeit
 
 Der Replikator prüft regelmäßig, ob die konfigurierte OrbitDB-Adresse noch eine funktionierende Datenbank liefert. Falls dies nicht der Fall ist, z.B. weil alle gepinnten Daten verschwunden sind:
 
-- erstellt der Replikator automatisch eine **[neue OrbitDB](OrbitDBNeuAnlageWieVorher.md)**,
+- erstellt der Replikator automatisch eine **[neue OrbitDB](src/docs/markdown/OrbitDBNeuAnlageWieVorher.md)**,
 - und publiziert deren Adresse über einen **signierten PubSub-Kanal**.
 
 ## 5. Kommunikation mit Clients über PubSub

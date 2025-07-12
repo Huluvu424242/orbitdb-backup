@@ -1,32 +1,48 @@
 // src/index.js
 import {createOrbitDB, OrbitDBAccessController} from '@orbitdb/core'
 import process from 'node:process'
-import {createRemoteIpfs} from "./remote.js";
-import {createLocalIpfs} from "./local.js";
+import { libp2pOptionsRemote} from "./remote.js";
+import { libp2pOptionsLocal} from "./local.js";
+import { create as createIpfsHttpClient } from 'ipfs-http-client';
+import {createHelia} from "helia";
+import {createLibp2p} from "libp2p";
+
+
+const jetzt = new Date();
+console.log('Serverstart: %s',jetzt.toLocaleString('de-DE'));
+
 
 // ENV Variablen laden
 const DEBUG = !!process.env.DEBUG || process.argv.includes('--debug');
 const isDebugActive = DEBUG;
 console.log(`--debug: ${isDebugActive}`);
-// const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/'));
-// const orbitDBAddress = ORBITDB_ADDR;
-// console.log(`ORBITDB_ADDR: ${orbitDBAddress}`);
 const IPFS_API_URL = process.env.IPFS_API_URL || process.argv.find(arg => arg.startsWith('http')) || 'http://localhost:5001'
 const ipfsApiUrl = IPFS_API_URL ;
 console.log(`IPFS_API_URL: ${ipfsApiUrl}`);
 // const PORT = process.env.PORT || 3000
 
-const jetzt = new Date();
-console.log('Serverstart: %s',jetzt.toLocaleString('de-DE'));
+// const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/'));
+// const orbitDBAddress = ORBITDB_ADDR;
+// console.log(`ORBITDB_ADDR: ${orbitDBAddress}`);
+const orbitDBAdress = process.argv.find(arg => arg.startsWith('/orbitdb/')) || "appstore-db";
+// || '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg';
+console.log('RemoteAdresse: %s',orbitDBAdress);
 
-async function createIpfsInstance(ipfsApiUrl) {
-    const ipfs = ipfsApiUrl ? await createRemoteIpfs(isDebugActive,ipfsApiUrl) : await createLocalIpfs(isDebugActive);
-    return {ipfs, remote: !!ipfsApiUrl};
-}
 
-const {ipfs, remote} = await createIpfsInstance(ipfsApiUrl);
+// async function createIpfsInstance(ipfsApiUrl) {
+//     const ipfs = ipfsApiUrl ? await createRemoteIpfs(isDebugActive,ipfsApiUrl) : await createLocalIpfs(isDebugActive);
+//     return {ipfs,};
+// }
+//
+// const {ipfs, remote} = await createIpfsInstance(ipfsApiUrl);
+
+const remote =  !!ipfsApiUrl;
 console.log('remote: %s',remote );
-const orbitdb = await createOrbitDB({ipfs, id: 'replicator1', directory: `./orbitdb/replicator1`
+
+const libp2p = await createLibp2p(remote ? libp2pOptionsRemote : libp2pOptionsLocal);
+const helia = await createHelia({ libp2p });
+// const orbitdb = await createOrbitDB({ ipfs: helia });
+const orbitdb = await createOrbitDB({ipfs:helia, id: 'replicator1', directory: `./orbitdb/replicator1`
     // , databases: [
     //     log(),
     //    //docstore()
@@ -36,10 +52,6 @@ const orbitdb = await createOrbitDB({ipfs, id: 'replicator1', directory: `./orbi
 console.log("ORBIT DB %s",orbitdb);
 
 
-const orbitDBAdress = process.argv.find(arg => arg.startsWith('/orbitdb/'))
-    || 'appstorage';
-    // || '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg';
-console.log('RemoteAdresse: %s',orbitDBAdress);
 const db = await orbitdb.open(orbitDBAdress,{
     // type: 'log',
     // create: !remote,
@@ -52,7 +64,14 @@ for await (const res of db.iterator()) {
     console.log(res);
 }
 
-
+const ipfs = createIpfsHttpClient({ url: ipfsApiUrl });
+try {
+    // einfacher Ping über HTTP-API
+    const version = await ipfs.version();
+    console.log("Verbunden mit IPFS:", version.version);
+} catch (err) {
+    console.error("⚠️ IPFS-Verbindung fehlgeschlagen:", err.message);
+}
 const pinEntry = async cid => {
     try {
         await ipfs.pins.add(cid);

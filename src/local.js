@@ -10,7 +10,7 @@ import {noise} from "@chainsafe/libp2p-noise";
 import {identify} from "@libp2p/identify";
 import {gossipsub} from "@chainsafe/libp2p-gossipsub";
 
-const libp2pOptions = {
+export const libp2pOptionsLocal = {
     peerDiscovery: [mdns()],
     addresses: {
         listen: ['/ip4/0.0.0.0/tcp/0']
@@ -27,7 +27,7 @@ const libp2pOptions = {
 export async function createLocalIpfs(isDebugActive) {
     console.log('✨ Lokaler IPFS-Modus');
     const blockstore = new LevelBlockstore(`./ipfs/replicator1`);
-    const libp2p = await createLibp2p(libp2pOptions);
+    const libp2p = await createLibp2p(libp2pOptionsLocal);
     activateDebugLogging(isDebugActive, libp2p);
     return await createHelia({libp2p, blockstore})
 }

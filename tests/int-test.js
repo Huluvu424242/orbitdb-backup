@@ -4,7 +4,7 @@ import process from 'node:process'
 import {createLocalIpfs} from "../src/local.js";
 
 const debug = process.argv.includes('--debug');
-const orbitDBAddress = '/orbitdb/zdpuAuNZTDiZHy2xpFGeVV5r5GELDxAkAdATeT5bATuGKSsER';
+const orbitDBAddress = '/orbitdb/zdpuAp6S4N8YXVDTn6Pvg6umXcVWJVXHp6nwpha2TUrhvXtkZ';
 
 if (!orbitDBAddress) {
     console.error('❌ Bitte gültige OrbitDB-Adresse angeben, z.B. /orbitdb/zdpuXYZ...');
@@ -14,7 +14,7 @@ if (!orbitDBAddress) {
 
 
 const ipfs = await createLocalIpfs(true);
-const orbitdb = await createOrbitDB({ipfs, id: 'replicator1', directory: `./orbitdb/replicator1`});
+const orbitdb = await createOrbitDB({ipfs, id: 'client1', directory: `./orbitdb/client1`});
 console.log("ORBIT DB %s", orbitdb);
 
 

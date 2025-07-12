@@ -21,11 +21,9 @@ const ipfsApiUrl = IPFS_API_URL ;
 console.log(`IPFS_API_URL: ${ipfsApiUrl}`);
 // const PORT = process.env.PORT || 3000
 
-// const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/'));
-// const orbitDBAddress = ORBITDB_ADDR;
-// console.log(`ORBITDB_ADDR: ${orbitDBAddress}`);
-const orbitDBAdress = process.argv.find(arg => arg.startsWith('/orbitdb/')) || "appstore-db";
-// || '/orbitdb/zdpuB24jCbRT7fPJSkZ1crpWL9Bz78s1TPdPSZNazWd8e7wqg';
+const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/')) || "appstore-db";
+const orbitDBAddress = ORBITDB_ADDR;
+console.log(`ORBITDB_ADDR: ${orbitDBAddress}`);
 console.log('RemoteAdresse: %s',orbitDBAdress);
 
 

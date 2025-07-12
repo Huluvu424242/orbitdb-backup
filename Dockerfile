@@ -1,15 +1,15 @@
 FROM node:22-alpine
 
+LABEL NODE_VERSION="Node Version"
+LABEL YARN_VERSION="Yarn Installer Version"
+
 # API-Zugangsdaten (kann beim Start mit -e API_KEY überschrieben werden)
 ENV DEBUG=false
+LABEL DEBUG="false"
 ENV IPFS_API_URL=
+LABEL IPFS_API_URL="URL des IPFS APIs z.B. http://localhost:5001"
 ENV ORBITDB_ADDR=
-
-
-# Datenbankverbindung (z.B. postgres://user:pass@host:port/db)
-ENV DATABASE_URL=postgres://localhost:5432/db
-
-
+LABEL ORBITDB_ADDR="Initiale OrbitDB Adresse, falls die DB bereits existiert"
 
 # Alle weiteren Kommandos relativ zu /app
 WORKDIR /app

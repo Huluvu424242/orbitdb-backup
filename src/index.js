@@ -8,6 +8,9 @@ import {createLocalIpfs} from "./local.js";
 const isDebugActive = process.argv.includes('--debug');
 const remoteUrlArg = process.argv.find(arg => arg.startsWith('--remote-ipfs='));
 
+const jetzt = new Date();
+console.log('Serverstart: %s',jetzt.toLocaleString('de-DE'));
+
 async function createIpfsInstance(remoteUrlArg) {
     const url = remoteUrlArg ? remoteUrlArg.split('=')[1] : null;
     const ipfs = remoteUrlArg ? await createRemoteIpfs(isDebugActive,url) : await createLocalIpfs(isDebugActive);

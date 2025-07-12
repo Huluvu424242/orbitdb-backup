@@ -42,7 +42,7 @@ console.log('remote: %s',remote );
 const libp2p = await createLibp2p(remote ? libp2pOptionsRemote : libp2pOptionsLocal);
 const helia = await createHelia({ libp2p });
 // const orbitdb = await createOrbitDB({ ipfs: helia });
-const orbitdb = await createOrbitDB({ipfs:helia, id: 'replicator1', directory: `./orbitdb/replicator1`
+const orbitdb = await createOrbitDB({ipfs:helia, id: 'replicator0', directory: `./orbitdb/replicator0`
     // , databases: [
     //     log(),
     //    //docstore()
@@ -106,6 +106,6 @@ process.on('SIGINT', async () => {
     console.log("Exiting...");
     await db.close();
     await orbitdb.stop();
-    await ipfs.stop();
+    // await ipfs.stop(); killt über den http client audch den kubo, wenn dann nur mit lokaler helia instanz nutzen
     process.exit(0);
 })

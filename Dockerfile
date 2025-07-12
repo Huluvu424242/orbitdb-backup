@@ -1,8 +1,10 @@
 FROM node:22-alpine
 
 # API-Zugangsdaten (kann beim Start mit -e API_KEY überschrieben werden)
+ENV DEBUG=false
 ENV IPFS_API_URL=
-ENV DEBUG=changeme
+ENV ORBITDB_ADDR=
+
 
 # Datenbankverbindung (z.B. postgres://user:pass@host:port/db)
 ENV DATABASE_URL=postgres://localhost:5432/db

@@ -4,20 +4,27 @@ import process from 'node:process'
 import {createRemoteIpfs} from "./remote.js";
 import {createLocalIpfs} from "./local.js";
 
-
-const isDebugActive = process.argv.includes('--debug');
-const remoteUrlArg = process.argv.find(arg => arg.startsWith('--remote-ipfs='));
+// ENV Variablen laden
+const DEBUG = !!process.env.DEBUG || process.argv.includes('--debug');
+const isDebugActive = DEBUG;
+console.log(`--debug: ${isDebugActive}`);
+// const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/'));
+// const orbitDBAddress = ORBITDB_ADDR;
+// console.log(`ORBITDB_ADDR: ${orbitDBAddress}`);
+const IPFS_API_URL = process.env.IPFS_API_URL || process.argv.find(arg => arg.startsWith('http')) || 'http://localhost:5001'
+const ipfsApiUrl = IPFS_API_URL ;
+console.log(`IPFS_API_URL: ${ipfsApiUrl}`);
+// const PORT = process.env.PORT || 3000
 
 const jetzt = new Date();
 console.log('Serverstart: %s',jetzt.toLocaleString('de-DE'));
 
-async function createIpfsInstance(remoteUrlArg) {
-    const url = remoteUrlArg ? remoteUrlArg.split('=')[1] : null;
-    const ipfs = remoteUrlArg ? await createRemoteIpfs(isDebugActive,url) : await createLocalIpfs(isDebugActive);
-    return {ipfs, remote: !!remoteUrlArg};
+async function createIpfsInstance(ipfsApiUrl) {
+    const ipfs = ipfsApiUrl ? await createRemoteIpfs(isDebugActive,ipfsApiUrl) : await createLocalIpfs(isDebugActive);
+    return {ipfs, remote: !!ipfsApiUrl};
 }
 
-const {ipfs, remote} = await createIpfsInstance(remoteUrlArg);
+const {ipfs, remote} = await createIpfsInstance(ipfsApiUrl);
 console.log('remote: %s',remote );
 const orbitdb = await createOrbitDB({ipfs, id: 'replicator1', directory: `./orbitdb/replicator1`
     // , databases: [

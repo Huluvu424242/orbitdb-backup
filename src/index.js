@@ -24,7 +24,7 @@ console.log(`IPFS_API_URL: ${ipfsApiUrl}`);
 const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/')) || "appstore-db";
 const orbitDBAddress = ORBITDB_ADDR;
 console.log(`ORBITDB_ADDR: ${orbitDBAddress}`);
-console.log('RemoteAdresse: %s',orbitDBAdress);
+console.log('RemoteAdresse: %s',orbitDBAddress);
 
 
 // async function createIpfsInstance(ipfsApiUrl) {

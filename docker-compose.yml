@@ -1,6 +1,25 @@
-version: '3.8'
+version: '3.9'
+
 services:
-  orbitdb-backup:
-    image: orbitdb-backup
+  orbitdb-replicator:
+    image: huluvu424242/orbitdb-backup:latest
+    container_name: orbitdb-backup
+    restart: unless-stopped
+
+    # Umgebungskonfiguration (ersetzt auch Parameterübergabe in Unraid)
+    environment:
+      - IPFS_API_URL=http://ipfs-kubo:5001
+      - ORBITDB_ADDRESS=/orbitdb/xyzabc123456/appstore-db
+      - DEBUG=false
+
+    # Bind-mount für persistente Konfig oder gepinnte Daten
     volumes:
-      - ./ipfs-data:/data
+      - ./data:/data
+
+    # Falls du im Container auf andere Container zugreifen willst (z.B. IPFS-Kubo)
+    networks:
+      - ipfs-net
+
+networks:
+  ipfs-net:
+    driver: bridge

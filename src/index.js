@@ -50,7 +50,7 @@ const orbitdb = await createOrbitDB({ipfs:helia, id: 'replicator0', directory: `
 console.log("ORBIT DB %s",orbitdb);
 
 
-const db = await orbitdb.open(orbitDBAdress,{
+const db = await orbitdb.open(orbitDBAddress,{
     // type: 'log',
     // create: !remote,
     ...( !remote && { AccessController: OrbitDBAccessController({ write: ['*'] }) } )

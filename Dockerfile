@@ -14,6 +14,7 @@ LABEL IPFS_API_URL="URL des IPFS APIs z.B. http://localhost:5001"
 ENV ORBITDB_ADDR="appstorage"
 LABEL ORBITDB_ADDR="Initiale OrbitDB Adresse, falls die DB bereits existiert"
 
+VOLUME /data
 
 # Alle weiteren Kommandos relativ zu /app
 WORKDIR /app

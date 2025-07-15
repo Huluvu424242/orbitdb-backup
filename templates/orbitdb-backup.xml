@@ -16,8 +16,8 @@
     https://hub.docker.com/r/huluvu424242/orbitdb-backup/</Overview>
   <Category/>
   <WebUI/>
-  <TemplateURL/>
-  <Icon/>
+  <TemplateURL>https://raw.githubusercontent.com/huluvu424242/unraid-templates/master/templates/orbitdb-backup.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/huluvu424242/unraid-templates/master/templates/icon.png</Icon>
   <ExtraParams/>
   <PostArgs/>
   <CPUset/>

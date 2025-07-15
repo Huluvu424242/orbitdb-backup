@@ -1,20 +1,16 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>orbitdb-backup</Name>
-  <Repository>huluvu424242/orbitdb-backup</Repository>
-  <Registry>https://hub.docker.com/r/huluvu424242/orbitdb-backup/</Registry>
-  <Network>bridge</Network>
-  <MyIP/>
-  <Shell>sh</Shell>
-  <Privileged>false</Privileged>
-  <Support>https://hub.docker.com/r/huluvu424242/orbitdb-backup/</Support>
-  <Project/>
-  <Overview>&#xD;
-    &#xD;
-    Converted By Community Applications   Always verify this template (and values)  against the support page for the container&#xD;
-    &#xD;
-    https://hub.docker.com/r/huluvu424242/orbitdb-backup/</Overview>
-  <Category/>
+  <Repository>huluvu424242/orbitdb-backup:latest</Repository>
+  <Registry>https://hub.docker.com/r/huluvu424242/orbitdb-backup</Registry>
+  <Overview>Beobachtet eine OrbitDB Instanz und pinnt neue Einträge automatisch über einen externen IPFS-Kubo-Node.</Overview>
+  <Category>Tools:Backup:IPFS</Category>
+  <Project>https://github.com/huluvu424242/orbitdb-backup</Project>
+  <Support>https://github.com/huluvu424242/orbitdb-backup/issues</Support>
+  <Description>
+    Der OrbitDB Backup Replikator überwacht eine bestehende OrbitDB-Datenbank (über einen externen IPFS-Kubo-Node)
+    und pinnt neue Einträge automatisch über die REST API des Nodes. Ideal für IPFS-basierte Backups.
+  </Description>
   <WebUI/>
   <TemplateURL>https://raw.githubusercontent.com/huluvu424242/unraid-templates/master/templates/orbitdb-backup.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/huluvu424242/unraid-templates/master/templates/icon.png</Icon>
@@ -30,6 +26,7 @@
   <Config Name="DEBUG" Target="DEBUG" Default="false" Mode="{3}" Description="" Type="Variable" Display="always" Required="false" Mask="false"/>
   <Config Name="IPFS_API_URL" Target="IPFS_API_URL" Default="http://127.0.0.1:5001" Mode="{3}" Description="" Type="Variable" Display="always" Required="false" Mask="false">http://192.168.1.44:5001</Config>
   <Config Name="ORBITDB_ADDR" Target="ORBITDB_ADDR" Default="appstorage" Mode="{3}" Description="" Type="Variable" Display="always" Required="false" Mask="false">appstorage</Config>
+  <Config Name="ORBITDB_DATA" Target="/data/orbitdb" Default="/mnt/user/appdata/orbitdb-backup/data" Mode="rw" Description="" Type="Path" Display="always" Required="false" Mask="false">/mnt/user/orbitdb-data/</Config>
   <Config Name="Community Applications Conversion" Target="Community_Applications_Conversion" Default="true" Mode="{3}" Description="" Type="Variable" Display="always" Required="false" Mask="false">true</Config>
   <TailscaleStateDir/>
 </Container>

@@ -17,11 +17,16 @@
     "@chainsafe/libp2p-gossipsub": "^14.1.1",
     "@chainsafe/libp2p-noise": "^16.1.4",
     "@chainsafe/libp2p-yamux": "^7.0.4",
-    "@libp2p/identify": "^3.0.37",
+    "@helia/unixfs": "^5.0.3",
+    "@libp2p/identify": "^3.0.38",
+    "@libp2p/kad-dht": "^15.1.10",
     "@libp2p/mdns": "^11.0.43",
-    "@libp2p/mplex": "^11.0.43",
-    "@libp2p/tcp": "^10.1.17",
+    "@libp2p/mplex": "^11.0.46",
+    "@libp2p/noise": "^12.0.1",
+    "@libp2p/ping": "^2.0.36",
+    "@libp2p/tcp": "^10.1.18",
     "@libp2p/websockets": "^9.2.17",
+    "@multiformats/multiaddr": "^12.5.1",
     "@orbitdb/core": "^2.1.0",
     "blockstore-core": "^5.0.4",
     "blockstore-level": "^2.0.3",
@@ -30,7 +35,7 @@
     "ipfs-core": "^0.18.1",
     "ipfs-http-client": "^60.0.1",
     "it-drain": "^3.0.10",
-    "libp2p": "^2.8.12"
+    "libp2p": "^2.9.0"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -13,6 +13,8 @@ ENV IPFS_API_URL="http://127.0.0.1:5001"
 LABEL IPFS_API_URL="URL des IPFS APIs z.B. http://localhost:5001"
 ENV ORBITDB_ADDR="appstorage"
 LABEL ORBITDB_ADDR="Initiale OrbitDB Adresse, falls die DB bereits existiert"
+ENV ORBITDB_DATA="/mnt/user/appdata/orbitdb-backup"
+LABEL ORBITDB_DATA="Share für OrbitDB Daten AREA"
 
 VOLUME /data
 

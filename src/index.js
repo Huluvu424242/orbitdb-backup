@@ -53,6 +53,7 @@ console.log("ORBIT DB %s",orbitdb);
 
 
 const db = await orbitdb.open(orbitDBAddress,{
+    type: 'events',
     ...( initMode & {create: true, AccessController: OrbitDBAccessController({ write: ['*'] }) } )
 });
 

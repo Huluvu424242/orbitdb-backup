@@ -7,6 +7,7 @@ import { create as createIpfsHttpClient } from 'ipfs-http-client';
 import {createHelia} from "helia";
 import {createLibp2p} from "libp2p";
 
+const initMode = true;
 
 const jetzt = new Date();
 console.log('Serverstart: %s',jetzt.toLocaleString('de-DE'));
@@ -53,7 +54,7 @@ console.log("ORBIT DB %s",orbitdb);
 const db = await orbitdb.open(orbitDBAddress,{
     // type: 'log',
     // create: !remote,
-    ...( !remote && { AccessController: OrbitDBAccessController({ write: ['*'] }) } )
+    ...( initMode & { AccessController: OrbitDBAccessController({ write: ['*'] }) } )
 });
 
 console.log('DB-Adresse:', db.address.toString());

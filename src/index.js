@@ -41,7 +41,7 @@ console.log('remote: %s',remote );
 const libp2p = await createLibp2p(remote ? libp2pOptionsRemote : libp2pOptionsLocal);
 const helia = await createHelia({ libp2p });
 // const orbitdb = await createOrbitDB({ ipfs: helia });
-const orbitdb = await createOrbitDB({ipfs:helia, id: 'replicator0', directory: `./orbitdb/replicator0`
+const orbitdb = await createOrbitDB({ipfs:helia, id: 'replicator0', directory: `/data/orbitdb/replicator0`
     // , databases: [
     //     log(),
     //    //docstore()

@@ -126,9 +126,27 @@ db.events.on('update', async entry => {
 
 
 process.on('SIGINT', async () => {
+    console.log("SIGINT empfangen");
+    shutdown();
+})
+
+
+process.on('SIGTERM', async () => {
+    console.log("SIGTERM empfangen");
+    shutdown();
+})
+
+async function shutdown() {
     console.log("Exiting...");
     await db.close();
-    await orbitdb.stop();
-    // await ipfs.stop(); killt über den http client audch den kubo, wenn dann nur mit lokaler helia instanz nutzen
-    process.exit(0);
-})
+    // OrbitDB schließen, ggf. IPFS-Knoten herunterfahren
+    // Beispiel:
+    if (orbitdb) {
+        orbitdb.stop().then(() => {
+            console.log('OrbitDB gestoppt.');
+            process.exit(0);
+        });
+    } else {
+        process.exit(0);
+    }
+}

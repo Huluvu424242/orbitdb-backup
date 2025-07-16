@@ -124,13 +124,13 @@ db.events.on('update', async entry => {
     await pinEntry(cid);
 });
 
-
+// Beenden unter Windows
 process.on('SIGINT', async () => {
     console.log("SIGINT empfangen");
     shutdown();
 })
 
-
+// Beenden unter unraid
 process.on('SIGTERM', async () => {
     console.log("SIGTERM empfangen");
     shutdown();

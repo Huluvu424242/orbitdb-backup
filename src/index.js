@@ -30,13 +30,11 @@ const ipfsApiUrl = IPFS_API_URL;
 console.log(`IPFS_API_URL: ${ipfsApiUrl}`);
 // const LIBP2P_PORT = 1620
 
-const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/')) || "appstore-db";
+const dbArg = process.argv.find(arg => arg.includes('/orbitdb/'));
+const orbitdbPath = dbArg? dbArg.substring(dbArg.indexOf('/orbitdb/')): null;
+const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/')) || orbitdbPath || "appstore-db";
 const orbitDBAddress = ORBITDB_ADDR;
 console.log(`ORBITDB_ADDR: ${orbitDBAddress}`);
-console.log('RemoteAdresse: %s', orbitDBAddress);
-
-const remote = !!ipfsApiUrl;
-console.log('remote: %s', remote);
 
 export const Libp2pOptions = {
     peerDiscovery: [
@@ -123,7 +121,7 @@ async function createOrOpenDB() {
         return database;
     } catch (err) {
         console.log("Datenbank existiert nicht, wird neu angelegt.")
-        const database = await  orbitdb.open(orbitDBAddress, {
+        const database = await  orbitdb.open("appdatastore-db", {
             type: 'events',
             create: true,
             accessController: OrbitDBAccessController({write: ['*']}),

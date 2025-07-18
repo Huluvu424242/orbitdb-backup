@@ -15,7 +15,9 @@ import {bitswap} from "@helia/block-brokers";
 
 console.log("ARGS: %s",process.argv);
 
-const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/')) || "appstore-db";
+const dbArg = process.argv.find(arg => arg.includes('/orbitdb/'));
+const orbitdbPath = dbArg? dbArg.substring(dbArg.indexOf('/orbitdb/')): null;
+const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/')) || orbitdbPath || "appstore-db";
 
 export const Libp2pOptions = {
     peerDiscovery: [

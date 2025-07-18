@@ -1,54 +1,65 @@
-// tests/int-test.js
-import {createOrbitDB} from '@orbitdb/core'
-import process from 'node:process'
-import {createLocalIpfs} from "../src/local.js";
+import { createHelia } from 'helia'
+import { createOrbitDB } from '@orbitdb/core'
+import { createLibp2p } from 'libp2p'
+import { noise } from '@libp2p/noise'
+import { mplex } from '@libp2p/mplex'
+import { webSockets } from '@libp2p/websockets'
+import { yamux } from '@chainsafe/libp2p-yamux'
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
+import { identify } from '@libp2p/identify'
+import { kadDHT } from '@libp2p/kad-dht'
+import { tcp } from '@libp2p/tcp'
+import {bootstrap} from "@libp2p/bootstrap";
 
-const debug = process.argv.includes('--debug');
-const orbitDBAddress = '/orbitdb/zdpuAp6S4N8YXVDTn6Pvg6umXcVWJVXHp6nwpha2TUrhvXtkZ';
+const ORBITDB_ADDRESS = '/orbitdb/zdpuAprpEXsiJVqHaKLxEV8mq5iAEHVFcE2R8peSRzBzHqYth/appstorage';
 
-if (!orbitDBAddress) {
-    console.error('❌ Bitte gültige OrbitDB-Adresse angeben, z.B. /orbitdb/zdpuXYZ...');
-    process.exit(1);
+const createNode = async () => {
+
+    const libp2p = await createLibp2p({
+        transports: [webSockets(), tcp()], // TCP erlaubt in Node.js
+        streamMuxers: [yamux(), mplex()],
+        connectionEncryption: [noise()],
+        pubsub: gossipsub(),
+        dht: kadDHT(),
+        peerDiscovery: [
+            bootstrap({
+                list: [
+                    '/ip4/219.89.34.152/tcp/63116/p2p/12D3KooWDZ5ouwFjYwC4F6bQQx8J4JFGHa6mrRGNybVUWxhmiDed'
+                ]
+            })
+        ],
+        identify: identify()
+    })
+
+
+    return await createHelia({ libp2p })
 }
 
+const main = async () => {
+    const helia = await createNode()
+    const orbitdb = await createOrbitDB({ ipfs: helia })
+
+    // Neue DB erzeugen oder öffnen
+    const db = await orbitdb.open(ORBITDB_ADDRESS);
 
 
-const ipfs = await createLocalIpfs(true);
-const orbitdb = await createOrbitDB({ipfs, id: 'client1', directory: `./orbitdb/client1`});
-console.log("ORBIT DB %s", orbitdb);
+    // // Write-Ereignisse anhören
+    // db.events.on('write', (address, entry, heads) => {
+    //     console.log(`✏️ Neue Eintragung: ${entry.payload.value}`)
+    // })
 
+    await db.load()
 
-console.log('RemoteAdresse: %s ', orbitDBAddress);
+    // Wert schreiben
+    await db.add({ ts: Date.now(), value: 'Hallo OrbitDB mit Helia!' })
 
-const db = await orbitdb.open(orbitDBAddress);
-// const db = await orbitdb.open(remoteDBAddress,{
-// type: 'log',
-// create: false,
-// ...( !remote && { AccessController: OrbitDBAccessController({ write: ['*'] }) } )
-// });
-console.log("ORBIT DB Adresse: %s", db.address.toString());
+    // Alle Werte lesen
+    const all = db.iterator({ limit: -1 }).collect()
+    console.log('\n📚 Inhalt der Datenbank:')
+    all.forEach(e => console.log('•', e.payload.value))
 
-const now = new Date().toISOString();
-const entry = {
-    id: 'replicator-test',
-    time: now,
-    message: '🛰️ Eintrag vom externen Test-Client'
-};
-
-console.log(`📤 Schreibe Testeintrag in ${db.address.toString()}...`);
-await db.add(entry);
-console.log('✅ Eintrag gespeichert.');
-
-console.log('📋 Aktuelle Inhalte:');
-for await (const item of db.iterator()) {
-    console.log('•', item);
+    // Optional: Helia sauber beenden
+    // await helia.stop()
 }
 
-// Clean shutdown
-process.on('SIGINT', async () => {
-    console.log("⏹️ Schließe…")
-    await db.close()
-    await orbitdb.stop()
-    await ipfs.stop()
-    process.exit(0)
-});
+main().catch(console.error)

@@ -2,31 +2,38 @@ import {createLibp2p} from 'libp2p'
 import {createHelia} from 'helia'
 import {createOrbitDB} from '@orbitdb/core'
 import {LevelBlockstore} from 'blockstore-level'
-import {multiaddr} from '@multiformats/multiaddr'
+import { identify } from '@libp2p/identify'
+import { webSockets } from '@libp2p/websockets'
+import { all } from '@libp2p/websockets/filters'
+import { noise } from '@chainsafe/libp2p-noise'
+import { yamux } from '@chainsafe/libp2p-yamux'
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import {mdns} from "@libp2p/mdns";
-import {tcp} from "@libp2p/tcp";
-import {noise} from "@libp2p/noise";
-import {yamux} from "@chainsafe/libp2p-yamux";
-import {identify} from "@libp2p/identify";
-import {gossipsub} from "@chainsafe/libp2p-gossipsub";
+import * as fs from "node:fs";
+import process from "node:process";
+import {bitswap} from "@helia/block-brokers";
 
+console.log("ARGS: %s",process.argv);
 
-const MULICAST_ADDR = '/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ';
-const ORBITDB_ADDR = '/orbitdb/zdpuAmCwQUhQ3Eu3swTQ9EbdEsqF5cu1ZCuR3XvoFA7B2sVtP';
-
+const ORBITDB_ADDR = process.env.ORBITDB_ADDR || process.argv.find(arg => arg.startsWith('/orbitdb/')) || "appstore-db";
 
 export const Libp2pOptions = {
     peerDiscovery: [
         mdns()
     ],
     addresses: {
-        listen: ['/ip4/0.0.0.0/tcp/0']
+        listen: ['/ip4/0.0.0.0/tcp/0/ws']
     },
     transports: [
-        tcp()
+        webSockets({
+            filter: all
+        })
     ],
     connectionEncrypters: [noise()],
     streamMuxers: [yamux()],
+    connectionGater: {
+        denyDialMultiaddr: () => false
+    },
     services: {
         identify: identify(),
         pubsub: gossipsub({allowPublishToZeroTopicPeers: true})
@@ -36,15 +43,18 @@ export const Libp2pOptions = {
 
 const main = async () => {
     // create a random directory to avoid OrbitDB conflicts.
-    let randDir = (Math.random() + 1).toString(36).substring(2)
+    const dataDir = (fs.existsSync('/data') && fs.lstatSync('/data').isDirectory()) ? '/data' :'./data';
+    console.log('Verzeichnis DATA %s', dataDir);
+    const randDir = (Math.random() + 1).toString(36).substring(2)
+    console.log('Verzeichnis Session: %s', randDir);
 
-    const blockstore = new LevelBlockstore(`./${randDir}/ipfs/blocks`)
+
+    const blockstore = new LevelBlockstore(`${dataDir}/ipfs/${randDir}/blocks`)
     const libp2p = await createLibp2p(Libp2pOptions)
-    const ipfs = await createHelia({libp2p, blockstore})
+    const ipfs = await createHelia({libp2p, blockstore, blockBrokers: [bitswap()]})
 
-    const orbitdb = await createOrbitDB({ipfs, directory: `./${randDir}/orbitdb`})
+    const orbitdb = await createOrbitDB({ipfs, directory: `${dataDir}/orbitdb/${randDir}`})
 
-    await orbitdb.ipfs.libp2p.dial(multiaddr(MULICAST_ADDR));
     console.log('opening db', ORBITDB_ADDR);
     const db = await orbitdb.open(ORBITDB_ADDR);
 
@@ -53,14 +63,15 @@ const main = async () => {
         console.log('update', entry.payload.value)
     })
 
-    if (ORBITDB_ADDR) {
-        await db.add('hello from second peer')
-        await db.add('hello again from second peer')
-    } else {
-        // write some records
-        await db.add('hello from first peer')
-        await db.add('hello again from first peer')
-    }
+    const manifestCid = db.address.root
+    console.log("Manifest CID:", manifestCid)
+
+
+    setInterval(async () => {
+        console.log("Peer Schreibversuch");
+        await db.add(`Hello from Peer1 at ${new Date().toISOString()}`);
+    },5000);
+
     // Clean up when stopping this app using ctrl+c
     process.on('SIGINT', async () => {
         // print the final state of the db.

@@ -35,11 +35,11 @@
     "blockstore-level": "^2.0.3",
     "datastore-core": "^10.0.4",
     "fs": "^0.0.1-security",
-    "helia": "^5.4.2",
+    "helia": "^7.1.12",
     "ipfs-core": "^0.18.1",
     "ipfs-http-client": "^60.0.1",
     "it-drain": "^3.0.10",
-    "libp2p": "^2.9.0"
+    "libp2p": "^3.3.11"
   },
   "engines": {
     "node": ">=18.0.0"
